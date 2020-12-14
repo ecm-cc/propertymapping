@@ -1,6 +1,7 @@
 const database = require('./module/databaseLoader');
 const config = require('./global.config')();
 const Category = require('./class/Category');
+const Property = require('./class/Property');
 
 function initDatabase(accessKeyId, secretAccessKey) {
     database.init(accessKeyId, secretAccessKey);
@@ -18,14 +19,14 @@ async function getAllCategories(stage) {
     return allCategories;
 }
 
-async function getCategory(stage, categoryID = false, categoryKey = false, displayname = false) {
+async function getCategory(stage, categoryID = undefined, categoryKey = undefined, displayName = undefined) {
     verifyStage(stage);
-    verifyParams([categoryID, categoryKey, displayname]);
+    verifyParams([categoryID, categoryKey, displayName]);
     const generalCategoryTableEntries = await database.scanTable(config.database.categories_general);
     const foundEntry = generalCategoryTableEntries.find((generalEntry) => {
         if((categoryID && generalEntry.CategoryID.S === categoryID)
             ||(categoryKey && generalEntry.CategoryKey.S === categoryKey)
-            || (displayname && generalEntry.Displayname.S === displayname)) {
+            || (displayName && generalEntry.Displayname.S === displayName)) {
             return generalEntry;
         }
     });
@@ -36,9 +37,9 @@ async function getCategory(stage, categoryID = false, categoryKey = false, displ
     return undefined;    
 }
 
-async function getCategoryByParent(stage, categoryID = false, categoryKey = false, displayname = false) {
+async function getCategoryByParent(stage, categoryID = undefined, categoryKey = undefined, displayName = undefined) {
     verifyStage(stage);
-    const parentCategory = await getCategory(stage, categoryID ,categoryKey, displayname);
+    const parentCategory = await getCategory(stage, categoryID ,categoryKey, displayName);
     if(!parentCategory) {
         return undefined;
     }
@@ -55,9 +56,9 @@ async function getCategoryByParent(stage, categoryID = false, categoryKey = fals
     return undefined;
 }
 
-async function getCategoryByChildren(stage, categoryID = false, categoryKey = false, displayname = false) {
+async function getCategoryByChildren(stage, categoryID = undefined, categoryKey = undefined, displayName = undefined) {
     verifyStage(stage);
-    const childCategory = await getCategory(stage, categoryID ,categoryKey, displayname);
+    const childCategory = await getCategory(stage, categoryID, categoryKey, displayName);
     if(!childCategory) {
         return undefined;
     }
@@ -74,6 +75,55 @@ async function getCategoryByChildren(stage, categoryID = false, categoryKey = fa
     return undefined;    
 }
 
+async function getAllProperties(stage) {
+    verifyStage(stage);
+    const allProperties = [];
+    const generalPropertyTableEntries = await database.scanTable(config.database.properties_general);
+    const stagePropertyTableEntries = await database.scanTable(config.database[`properties_${stage}`]);
+    generalPropertyTableEntries.forEach((generalEntry) => {
+        const stageEntry = stagePropertyTableEntries.find((entry) => entry.PropertyID.S === generalEntry.PropertyID.S);
+        allProperties.push(new Property(generalEntry, stageEntry));
+    });
+    return allProperties;
+}
+
+async function getProperty(stage, propertyID = undefined, displayName = undefined, databasePosition = undefined, categoryKey = undefined, propertyKey = undefined) {
+    verifyStage(stage);
+    verifyParams([propertyID, displayName, databasePosition, categoryKey, propertyKey]);
+    const generalPropertyTableEntries = await database.scanTable(config.database.properties_general);
+    const stagePropertyTableEntries = propertyKey ? await database.scanTableByPropertyKey(config.database[`properties_${stage}`], propertyKey) : null;
+    const foundEntry = generalPropertyTableEntries.find((generalEntry) => {
+        if((propertyID && generalEntry.PropertyID.S === propertyID)
+            ||(categoryKey && databasePosition && generalEntry.CategoryKey.S === categoryKey && generalEntry.DatabasePosition.N === databasePosition.toString())
+            || (displayName && generalEntry.DisplayName.S === displayName)) {
+            return generalEntry;
+        }
+        if(propertyKey && stagePropertyTableEntries[0].PropertyID.S === generalEntry.PropertyID.S) {
+            return generalEntry;
+        }
+    });
+    if(foundEntry) {
+        const stageEntries = await database.scanTableByPropertyID(config.database[`properties_${stage}`], foundEntry.PropertyID.S);
+        return new Property(foundEntry, stageEntries[0]);
+    }
+    return undefined; 
+}
+
+async function getPropertiesByCategory(stage, categoryID = undefined, categoryKey = undefined, displayName = undefined) {
+    const foundProperties = [];
+    const category = await getCategory(stage, categoryID, categoryKey, displayName);
+    if(!category) {
+        return undefined;
+    }
+    verifyStage(stage);
+    const generalPropertyTableEntries = await database.scanTableByCategoryKey(config.database.properties_general, category.categoryKey);
+    for(let i in generalPropertyTableEntries) {
+        const stageEntries = await database.scanTableByPropertyID(config.database[`properties_${stage}`], generalPropertyTableEntries[i].PropertyID.S);
+        foundProperties.push(new Property(generalPropertyTableEntries[i], stageEntries[0])); 
+    }
+    return foundProperties;
+}
+
 function verifyStage(stage) {
     if(!config.stages.includes(stage)) {
         throw new Error(`Stage "${stage}" is not available. Available stages are ${config.stages.join(', ')}`);
@@ -81,8 +131,11 @@ function verifyStage(stage) {
 }
 
 function verifyParams(params) {
-    if(params.filter(param => param !== false).length === 0) {
+    if(params.filter(param => param != undefined).length === 0) {
         throw new Error('No params found, provide at least one param to search for');
+    }
+    if(params.length === 5 && (params[2] && !params[3] || !params[2] && params[3])) {
+        throw new Error('CategoryKey and DatabasePosition are required in order to search by them');
     }
 }
 
@@ -91,5 +144,8 @@ module.exports = {
     getAllCategories,
     getCategory,
     getCategoryByChildren,
-    getCategoryByParent
+    getCategoryByParent,
+    getAllProperties,
+    getProperty,
+    getPropertiesByCategory
 };

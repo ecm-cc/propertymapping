@@ -29,6 +29,48 @@ async function scanTableByCategoryID(options, categoryID) {
     return scanResult.Items;
 }
 
+async function scanTableByPropertyID(options, propertyID) {
+    verifyDatabase();
+    options.ExpressionAttributeValues = {
+        ":a": {
+            S: propertyID
+        }
+    };
+    options.FilterExpression =  "PropertyID = :a";
+    const scanResult = await dynamoDB.scan(options).promise();
+    delete options.FilterExpression;
+    delete options.ExpressionAttributeValues;
+    return scanResult.Items;
+}
+
+async function scanTableByCategoryKey(options, categoryKey) {
+    verifyDatabase();
+    options.ExpressionAttributeValues = {
+        ":a": {
+            S: categoryKey
+        }
+    };
+    options.FilterExpression =  "CategoryKey = :a";
+    const scanResult = await dynamoDB.scan(options).promise();
+    delete options.FilterExpression;
+    delete options.ExpressionAttributeValues;
+    return scanResult.Items;
+}
+
+async function scanTableByPropertyKey(options, propertyKey) {
+    verifyDatabase();
+    options.ExpressionAttributeValues = {
+        ":a": {
+            N: propertyKey.toString()
+        }
+    };
+    options.FilterExpression =  "PropertyKey = :a";
+    const scanResult = await dynamoDB.scan(options).promise();
+    delete options.FilterExpression;
+    delete options.ExpressionAttributeValues;
+    return scanResult.Items;
+}
+
 function verifyDatabase() {
     if(!dynamoDB) {
         throw new Error('Database was not initialized');
@@ -39,5 +81,8 @@ function verifyDatabase() {
 module.exports = {
     init,
     scanTable,
-    scanTableByCategoryID
+    scanTableByCategoryID,
+    scanTableByPropertyID,
+    scanTableByCategoryKey,
+    scanTableByPropertyKey,
 };

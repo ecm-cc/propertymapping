@@ -5,7 +5,7 @@ class Category {
         this.displayname = generalDatabaseElement.Displayname.S;
         this.writeAccess = stageDatabaseElement.WriteAccess.N === '1' ? true : false;
         this.children = stageDatabaseElement.Children.S.split(',');
-        this.parents = stageDatabaseElement.Parent.S.split(',');
+        this.parent = stageDatabaseElement.Parent.S.split(',');
     }
 };
 

@@ -51,7 +51,7 @@ mapping.initDatabase(accessKeyID, secretAccessKey);
 
 #### Funktionsparameter
 | Parameter | Beschreibung  |
-|-----------------|--------|--------------|
+|-----------|---------------|
 | `accessKeyID`  | ID des Access Keys des zu nutzenden AWS-Accounts |
 | `secretAccessKey` | Secret Access Key des zu nutzenden AWS-Accounts |
 
@@ -65,12 +65,12 @@ Lädt alle in der Datenbank verfügbaren Kategorien zu einer Stage.
 
 #### Funktionsparameter
 | Parameter | Beschreibung | Beispiel |
-|----------|--------|--------------|
-| `stage`  | Zu durchsuchende d.3-Stage| `'dev'` |
+|-----------|-----------------------------|---------|
+| `stage`   | Zu durchsuchende d.3-Stage  | `'dev'` |
 
 #### Rückgabewert
 | Datentyp | Beschreibung  |
-|-----------------|--------|--------------|
+|-----------------|--------|
 | `Category[]` oder <br>`[]`  | Liste der Kategorien in der Datenbank |
 
 
@@ -92,7 +92,7 @@ Lädt eine Kategorie anhand eines eindeutigen Filerparameters. Zur Suche nach ei
 
 #### Rückgabewert
 | Datentyp | Beschreibung  |
-|-----------------|--------|--------------|
+|-----------------|--------|
 | `Category` oder <br>`undefined`  | Gefundene Kategorie entsprechend der Filterparameter oder <br> `undefined`, wenn keine Kategorie gefunden wurde |
 
 
@@ -135,7 +135,7 @@ Lädt die Elternkategorie einer Kategorie anhand eines eindeutigen Filerparamete
 
 #### Rückgabewert
 | Datentyp | Beschreibung  |
-|-----------------|--------|--------------|
+|-----------------|--------|
 | `Category` oder <br>`undefined`  | Gefundene Elternkategorie entsprechend der Filterparameter oder <br> `undefined`, wenn keine Kategorie gefunden wurde |
 
 ### Laden aller Eigenschaften
@@ -176,7 +176,7 @@ Lädt eine Eigenschaft anhand eines eindeutigen Filerparameters. Zur Suche nach 
 
 #### Rückgabewert
 | Datentyp | Beschreibung  |
-|-----------------|--------|--------------|
+|-----------------|--------|
 | `Property` oder <br>`undefined`  | Gefundene Eigenschaft entsprechend der Filterparameter oder <br> `undefined`, wenn keine Eigenschaft gefunden wurde |
 
 ### Laden aller Eigenschaften zu einer Kategorie

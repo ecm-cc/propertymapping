@@ -1,19 +1,18 @@
 {
-  "name": "propertymapping",
-  "version": "1.0.0",
+  "name": "@ablegroup/propertymapping",
+  "version": "1.0.1",
   "description": "Utility to load mapping from DynamoDB",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/ecm-cc/propertymapping/tree/master/module"
+    "type": "git",
+    "url": "https://github.com/ecm-cc/propertymapping/tree/master/module"
   },
   "author": "Alexander Strutz",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.802.0",
-    "axios": "^0.21.0"
+    "aws-sdk": "^2.802.0"
   }
 }

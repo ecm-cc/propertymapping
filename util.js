@@ -3,8 +3,8 @@ const axios = require('axios');
 const AWS = require('aws-sdk'); 
 const dynamoDB = new AWS.DynamoDB({
     region: 'eu-central-1', 
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    accessKeyId: process.env.DB_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.DB_AWS_SECRET_ACCESS_KEY
 });
 
 async function putItem(TableName, Item){

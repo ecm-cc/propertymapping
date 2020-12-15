@@ -3,10 +3,20 @@ const config = require('./global.config')();
 const Category = require('./class/Category');
 const Property = require('./class/Property');
 
+/**
+ * Intializes a DynamoDB to be used further on 
+ * @param {String} accessKeyId AWS Access Key ID to be authenticated with
+ * @param {String} secretAccessKey AWS Secret Access Key to be authenticated with
+ */
 function initDatabase(accessKeyId, secretAccessKey) {
     database.init(accessKeyId, secretAccessKey);
 }
 
+/**
+ * Loads all categories of a given stage
+ * @param {String} stage Stage to be searched on
+ * @returns {Promise<Category[]>} List fo found categories
+ */
 async function getAllCategories(stage) {
     verifyStage(stage);
     const allCategories = [];
@@ -19,6 +29,14 @@ async function getAllCategories(stage) {
     return allCategories;
 }
 
+/**
+ * Loads a category by a given filter attribute
+ * @param {String} stage Stage to be searched on
+ * @param {String=} categoryID category ID to filter on
+ * @param {String=} categoryKey category key to filter on
+ * @param {String=} displayName displayname to filter on
+ * @returns {(Promise<Category>|undefined)} Found category or undefined
+ */
 async function getCategory(stage, categoryID = undefined, categoryKey = undefined, displayName = undefined) {
     verifyStage(stage);
     verifyParams([categoryID, categoryKey, displayName]);
@@ -37,6 +55,14 @@ async function getCategory(stage, categoryID = undefined, categoryKey = undefine
     return undefined;    
 }
 
+/**
+ * Loads child categories by a given filter attribute
+ * @param {String} stage Stage to be searched on
+ * @param {String=} categoryID category ID to filter on
+ * @param {String=} categoryKey category key to filter on
+ * @param {String=} displayName displayname to filter on
+ * @returns {(Promise<Category[]>|undefined)} Found child categories or undefined
+ */
 async function getCategoryByParent(stage, categoryID = undefined, categoryKey = undefined, displayName = undefined) {
     verifyStage(stage);
     const parentCategory = await getCategory(stage, categoryID ,categoryKey, displayName);
@@ -56,6 +82,14 @@ async function getCategoryByParent(stage, categoryID = undefined, categoryKey = 
     return undefined;
 }
 
+/**
+ * Loads a parent category by a given filter attribute
+ * @param {String} stage Stage to be searched on
+ * @param {String=} categoryID category ID to filter on
+ * @param {String=} categoryKey category key to filter on
+ * @param {String=} displayName displayname to filter on
+ * @returns {(Promise<Category>|undefined)} Found parent category or undefined
+ */
 async function getCategoryByChildren(stage, categoryID = undefined, categoryKey = undefined, displayName = undefined) {
     verifyStage(stage);
     const childCategory = await getCategory(stage, categoryID, categoryKey, displayName);
@@ -75,6 +109,11 @@ async function getCategoryByChildren(stage, categoryID = undefined, categoryKey 
     return undefined;    
 }
 
+/**
+ * Loads all properties of a given stage
+ * @param {String} stage Stage to be searched on
+ * @returns {Promise<Property[]>} List fo found properties
+ */
 async function getAllProperties(stage) {
     verifyStage(stage);
     const allProperties = [];
@@ -87,6 +126,16 @@ async function getAllProperties(stage) {
     return allProperties;
 }
 
+/**
+ * Loads a property by a given filter attribute
+ * @param {String} stage Stage to be searched on
+ * @param {String=} propertyID property ID to filter on
+ * @param {String=} displayName displayname to filter on
+ * @param {String=} databasePosition database position to filter on, requires also a category key
+ * @param {String=} categoryKey category key to filter on, requires also a database position
+ * @param {String=} propertyKey property key to filter on
+ * @returns {(Promise<Property>|undefined)} Found property or undefined
+ */
 async function getProperty(stage, propertyID = undefined, displayName = undefined, databasePosition = undefined, categoryKey = undefined, propertyKey = undefined) {
     verifyStage(stage);
     verifyParams([propertyID, displayName, databasePosition, categoryKey, propertyKey]);
@@ -109,6 +158,14 @@ async function getProperty(stage, propertyID = undefined, displayName = undefine
     return undefined; 
 }
 
+/**
+ * Loads all properties by a given category filter attribute
+ * @param {String} stage Stage to be searched on
+ * @param {String=} categoryID category ID to filter on
+ * @param {String=} categoryKey category key to filter on
+ * @param {String=} displayName displayname to filter on
+ * @returns {(Promise<Property[]>)} Found properties or undefined
+ */
 async function getPropertiesByCategory(stage, categoryID = undefined, categoryKey = undefined, displayName = undefined) {
     const foundProperties = [];
     const category = await getCategory(stage, categoryID, categoryKey, displayName);
@@ -124,12 +181,20 @@ async function getPropertiesByCategory(stage, categoryID = undefined, categoryKe
     return foundProperties;
 }
 
+/**
+ * Verifies if a stage exists
+ * @throws Will throw an error if a stage doesn't exist
+ */
 function verifyStage(stage) {
     if(!config.stages.includes(stage)) {
         throw new Error(`Stage "${stage}" is not available. Available stages are ${config.stages.join(', ')}`);
     }
 }
 
+/**
+ * Verifies if a param is set
+ * @throws Will throw no param is set or depending params are not set
+ */
 function verifyParams(params) {
     if(params.filter(param => param != undefined).length === 0) {
         throw new Error('No params found, provide at least one param to search for');
@@ -139,6 +204,10 @@ function verifyParams(params) {
     }
 }
 
+/**
+ * @module main
+ * @desc Provides the API for the propertymapping module
+ */
 module.exports = {
     initDatabase,
     getAllCategories,

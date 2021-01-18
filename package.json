@@ -1,6 +1,6 @@
 {
   "name": "propertymapping",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Job to map d.3 properties between all stages",
   "main": "main.js",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "@ablegroup/propertymapping",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Utility to load mapping from DynamoDB",
   "main": "main.js",
   "scripts": {

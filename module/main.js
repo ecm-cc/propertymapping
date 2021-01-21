@@ -147,7 +147,7 @@ async function getProperty(stage, propertyID = undefined, displayName = undefine
             || (displayName && generalEntry.DisplayName.S === displayName)) {
             return generalEntry;
         }
-        if(propertyKey && stagePropertyTableEntries[0].PropertyID.S === generalEntry.PropertyID.S) {
+        if(propertyKey && stagePropertyTableEntries[0] && stagePropertyTableEntries[0].PropertyID.S === generalEntry.PropertyID.S) {
             return generalEntry;
         }
     });
@@ -175,8 +175,10 @@ async function getPropertiesByCategory(stage, categoryID = undefined, categoryKe
     verifyStage(stage);
     const generalPropertyTableEntries = await database.scanTableByCategoryKey(config.database.properties_general, category.categoryKey);
     for(let i in generalPropertyTableEntries) {
-        const stageEntries = await database.scanTableByPropertyID(config.database[`properties_${stage}`], generalPropertyTableEntries[i].PropertyID.S);
-        foundProperties.push(new Property(generalPropertyTableEntries[i], stageEntries[0])); 
+        if(generalPropertyTableEntries[i]) {
+            const stageEntries = await database.scanTableByPropertyID(config.database[`properties_${stage}`], generalPropertyTableEntries[i].PropertyID.S);
+            foundProperties.push(new Property(generalPropertyTableEntries[i], stageEntries[0])); 
+        } 
     }
     return foundProperties;
 }
